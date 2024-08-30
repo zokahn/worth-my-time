@@ -169,21 +169,23 @@
                 const performanceHtml = `
                     <p>Model Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>
                     <p>F1 Score: ${(data.f1_score * 100).toFixed(2)}%</p>
-                    <p>Confusion Matrix:</p>
-                    <pre>${JSON.stringify(data.confusion_matrix, null, 2)}</pre>
+                    <h3>Confusion Matrix:</h3>
+                    <table id="confusion-matrix"></table>
                 `;
                 document.getElementById('model-performance').innerHTML = performanceHtml;
-            });
-
-        // Fetch and display model performance metrics
-        fetch('/api/model_performance')
-            .then(response => response.json())
-            .then(data => {
-                const performanceHtml = `
-                    <p>Model Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>
-                    <p>F1 Score: ${(data.f1_score * 100).toFixed(2)}%</p>
-                `;
-                document.getElementById('model-performance').innerHTML = performanceHtml;
+                
+                // Create confusion matrix table
+                const table = document.getElementById('confusion-matrix');
+                data.confusion_matrix.forEach((row, i) => {
+                    const tr = table.insertRow();
+                    row.forEach((cell, j) => {
+                        const td = tr.insertCell();
+                        td.textContent = cell;
+                        if (i === j) {
+                            td.style.backgroundColor = '#90EE90';  // Light green for correct predictions
+                        }
+                    });
+                });
             });
     </script>
 </body>
