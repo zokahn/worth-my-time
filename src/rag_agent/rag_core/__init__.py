@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 from collections import Counter
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import config
+
+DATA_DIR = config.get('DATA_DIR')
+SUMMARIES_DIR = config.get('SUMMARIES_DIR')
 from src.rag_agent.utils.exceptions import StatusFileProcessingError
 from src.rag_agent.utils.nlp import categorize_text
 
