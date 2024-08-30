@@ -47,3 +47,19 @@ def store_status_file(filename, content):
     # Save the data
     with open(file_path, 'w') as file:
         json.dump(status_data, file, indent=4)
+
+def store_daily_summary(summary):
+    "Store the daily summary"
+    
+    # Create the directory for storing the summaries if it doesn't exist
+    os.makedirs('data/summaries', exist_ok=True)
+
+    # Get the current date
+    date = datetime.now().strftime('%Y-%m-%d')
+
+    # Define the path to the summary file
+    file_path = os.path.join('data/summaries', f'{date}_summary.txt')
+
+    # Save the summary
+    with open(file_path, 'w') as file:
+        file.write(summary)

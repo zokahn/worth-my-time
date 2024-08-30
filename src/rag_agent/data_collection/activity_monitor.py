@@ -2,8 +2,10 @@ import time
 import os
 from datetime import datetime
 from src.rag_agent.data_storage.data_store import store_activity, store_status_file
+from src.rag_agent.rag_core import process_status_files, generate_daily_summary
 
 import subprocess
+import json
 
 def get_active_window_title():
     "Get the active window title"
@@ -69,6 +71,27 @@ def ingest_status_files():
                 content = file.read()
                 store_status_file(filename, content)
 
+def generate_end_of_day_summary():
+    "Generate and store the end-of-day summary"
+    project_summary = process_status_files()
+    
+    # Load today's activities
+    today = datetime.now().strftime('%Y-%m-%d')
+    activities_file = f'data/{today}.json'
+    if os.path.exists(activities_file):
+        with open(activities_file, 'r') as file:
+            activities = json.load(file)
+    else:
+        activities = []
+    
+    daily_summary = generate_daily_summary(project_summary, activities)
+    
+    # Save the daily summary
+    os.makedirs('data/summaries', exist_ok=True)
+    with open(f'data/summaries/{today}_summary.txt', 'w') as file:
+        file.write(daily_summary)
+
 if __name__ == "__main__":
     ingest_status_files()
     monitor_activities()
+    generate_end_of_day_summary()
