@@ -2,15 +2,15 @@ import os
 import json
 from datetime import datetime, timedelta
 from src.rag_agent.utils.logging_config import logger
+from src.rag_agent.config import STATUS_DIR, DATA_DIR, SUMMARIES_DIR
 
 def process_status_files():
     "Process the ingested status files"
-    status_dir = 'data/status'
     project_summary = {}
     
     try:
-        for filename in os.listdir(status_dir):
-            file_path = os.path.join(status_dir, filename)
+        for filename in os.listdir(STATUS_DIR):
+            file_path = os.path.join(STATUS_DIR, filename)
             if os.path.isfile(file_path):
                 with open(file_path, 'r') as file:
                     status_data = json.load(file)
@@ -62,8 +62,15 @@ def generate_daily_summary(project_summary, activities):
         summary += f"- {question}\n"
     
     summary += "\nToday's Activities:\n"
+    activity_categories = {}
     for activity in activities:
-        summary += f"- {activity['timestamp']}: {activity['category']} - {activity['window_title']}\n"
+        category = activity['category']
+        if category not in activity_categories:
+            activity_categories[category] = 0
+        activity_categories[category] += 1
+    
+    for category, count in activity_categories.items():
+        summary += f"- {category}: {count} activities\n"
     
     return summary
 
@@ -72,7 +79,7 @@ if __name__ == "__main__":
     
     # Load today's activities
     today = datetime.now().strftime('%Y-%m-%d')
-    activities_file = f'data/{today}.json'
+    activities_file = os.path.join(DATA_DIR, f'{today}.json')
     if os.path.exists(activities_file):
         with open(activities_file, 'r') as file:
             activities = json.load(file)
@@ -83,6 +90,7 @@ if __name__ == "__main__":
     print(daily_summary)
     
     # Save the daily summary
-    os.makedirs('data/summaries', exist_ok=True)
-    with open(f'data/summaries/{today}_summary.txt', 'w') as file:
+    summary_file = os.path.join(SUMMARIES_DIR, f'{today}_summary.txt')
+    os.makedirs(os.path.dirname(summary_file), exist_ok=True)
+    with open(summary_file, 'w') as file:
         file.write(daily_summary)

@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 from src.rag_agent.utils.logging_config import logger
+from src.rag_agent.config import DATA_DIR, STATUS_DIR, SUMMARIES_DIR
 
 def store_activity(activity):
     "Store the activity data in a JSON file"
@@ -11,10 +12,10 @@ def store_activity(activity):
         date = datetime.now().strftime('%Y-%m-%d')
 
         # Create the directory for storing the data if it doesn't exist
-        os.makedirs('data', exist_ok=True)
+        os.makedirs(DATA_DIR, exist_ok=True)
 
         # Define the path to the JSON file
-        file_path = os.path.join('data', f'{date}.json')
+        file_path = os.path.join(DATA_DIR, f'{date}.json')
 
         # Load the existing data
         if os.path.exists(file_path):
@@ -38,10 +39,10 @@ def store_status_file(filename, content):
     "Store the status file content"
     
     # Create the directory for storing the status files if it doesn't exist
-    os.makedirs('data/status', exist_ok=True)
+    os.makedirs(STATUS_DIR, exist_ok=True)
 
     # Define the path to the JSON file
-    file_path = os.path.join('data/status', f'{filename}.json')
+    file_path = os.path.join(STATUS_DIR, f'{filename}.json')
 
     # Create a dictionary with the file content and timestamp
     status_data = {
@@ -58,13 +59,13 @@ def store_daily_summary(summary):
     "Store the daily summary"
     
     # Create the directory for storing the summaries if it doesn't exist
-    os.makedirs('data/summaries', exist_ok=True)
+    os.makedirs(SUMMARIES_DIR, exist_ok=True)
 
     # Get the current date
     date = datetime.now().strftime('%Y-%m-%d')
 
     # Define the path to the summary file
-    file_path = os.path.join('data/summaries', f'{date}_summary.txt')
+    file_path = os.path.join(SUMMARIES_DIR, f'{date}_summary.txt')
 
     # Save the summary
     with open(file_path, 'w') as file:
