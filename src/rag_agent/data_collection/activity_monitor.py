@@ -39,8 +39,27 @@ def categorize_activity(active_window_title):
     "Categorize the activity based on the active window title using plugins"
     categorizer_plugin = plugin_manager.get_plugin('activity_categorizer')
     if categorizer_plugin:
-        return categorizer_plugin.execute(active_window_title, ACTIVITY_CATEGORIES)
-    return categorize_text(active_window_title, ACTIVITY_CATEGORIES)
+        category = categorizer_plugin.execute(active_window_title, ACTIVITY_CATEGORIES)
+    else:
+        category = categorize_text(active_window_title, ACTIVITY_CATEGORIES)
+    
+    # Determine if the activity is private or business-related
+    privacy_classifier = plugin_manager.get_plugin('privacy_classifier')
+    if privacy_classifier:
+        privacy = privacy_classifier.execute(active_window_title)
+    else:
+        privacy = classify_privacy(active_window_title)
+    
+    return category, privacy
+
+def classify_privacy(text):
+    "Classify the activity as private or business-related based on keywords"
+    business_keywords = ['work', 'project', 'meeting', 'client', 'report', 'email', 'slack', 'jira', 'confluence']
+    text_lower = text.lower()
+    for keyword in business_keywords:
+        if keyword in text_lower:
+            return 'business'
+    return 'private'
 
 def associate_activity_with_project(active_window_title):
     "Associate the activity with a project based on the active window title using plugins"
@@ -54,14 +73,15 @@ def monitor_activities():
     while True:
         try:
             active_window_title = get_active_window_title()
-            activity_category = categorize_activity(active_window_title)
+            activity_category, privacy = categorize_activity(active_window_title)
             associated_project = associate_activity_with_project(active_window_title)
 
             activity = {
                 'timestamp': datetime.now().isoformat(),
                 'window_title': active_window_title,
                 'category': activity_category,
-                'project': associated_project
+                'project': associated_project,
+                'privacy': privacy
             }
             store_activity(activity)
             logger.info(f"Activity logged: {activity}")
