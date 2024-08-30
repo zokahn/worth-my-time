@@ -153,9 +153,27 @@
                     resultHtml += `<li>${category}: ${(prob * 100).toFixed(2)}%</li>`;
                 }
                 resultHtml += '</ul>';
+                resultHtml += '<p>Top Features:</p><ul>';
+                for (const [feature, importance] of data.top_features) {
+                    resultHtml += `<li>${feature}: ${importance.toFixed(4)}</li>`;
+                }
+                resultHtml += '</ul>';
                 document.getElementById('prediction-result').innerHTML = resultHtml;
             });
         });
+
+        // Fetch and display model performance metrics
+        fetch('/api/model_performance')
+            .then(response => response.json())
+            .then(data => {
+                const performanceHtml = `
+                    <p>Model Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>
+                    <p>F1 Score: ${(data.f1_score * 100).toFixed(2)}%</p>
+                    <p>Confusion Matrix:</p>
+                    <pre>${JSON.stringify(data.confusion_matrix, null, 2)}</pre>
+                `;
+                document.getElementById('model-performance').innerHTML = performanceHtml;
+            });
 
         // Fetch and display model performance metrics
         fetch('/api/model_performance')

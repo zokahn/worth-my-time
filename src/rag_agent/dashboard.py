@@ -72,9 +72,20 @@ def predict_activity():
     window_title = data['window_title']
     predicted_category = predictor.predict(timestamp, window_title)
     probabilities = predictor.predict_proba(timestamp, window_title)
+    top_features = predictor.get_top_features(n=5)
     return jsonify({
         'predicted_category': predicted_category,
-        'probabilities': {category: float(prob) for category, prob in zip(predictor.model.classes_, probabilities)}
+        'probabilities': {category: float(prob) for category, prob in zip(predictor.model.classes_, probabilities)},
+        'top_features': top_features
+    })
+
+@app.route('/api/model_performance')
+def model_performance():
+    accuracy, f1_score, confusion_matrix = predictor.get_model_performance()
+    return jsonify({
+        'accuracy': accuracy,
+        'f1_score': f1_score,
+        'confusion_matrix': confusion_matrix.tolist()
     })
 
 @app.route('/api/feature_importance')
