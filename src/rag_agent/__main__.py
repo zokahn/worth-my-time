@@ -4,10 +4,14 @@ import sys
 from datetime import datetime, timedelta
 from src.rag_agent.reporting import generate_daily_report, generate_weekly_report
 from project_assistant import analyze_status_files
+from src.rag_agent.rag_core import initialize_plugins
 
 sys.path.append('.')
 
 print("RAG agent started")
+
+# Initialize plugins
+initialize_plugins()
 
 # Start the activity monitor in the background
 subprocess.Popen(["python", os.path.join("src", "rag_agent", "data_collection", "activity_monitor.py")])
@@ -20,3 +24,5 @@ print(generate_weekly_report((datetime.now() - timedelta(days=7)).strftime('%Y-%
 
 # Analyze the status files and print the insights
 print(analyze_status_files())
+
+print("RAG agent, plugins, and dashboard are running")
