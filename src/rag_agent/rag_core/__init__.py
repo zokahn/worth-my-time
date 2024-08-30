@@ -102,7 +102,13 @@ def generate_daily_summary(project_summary, activities):
         summary += f"- {title}: {count} times\n"
     
     summary += "\nActivity Insights:\n"
-    summary += generate_activity_insights(activities)
+    insights = generate_activity_insights(activities)
+    summary += insights
+    
+    summary += "\nRecommendations:\n"
+    recommendations = generate_recommendations(insights)
+    for recommendation in recommendations:
+        summary += f"- {recommendation}\n"
     
     notification_service.send_notification('report_completion', f"Daily summary generated for {datetime.now().strftime('%Y-%m-%d')}")
     
@@ -141,7 +147,46 @@ def generate_activity_insights(activities):
     longest_focus_category = max(category_durations, key=category_durations.get)
     insights += f"\nLongest focus period: {longest_focus:.2f} minutes on {longest_focus_category}\n"
     
+    # Task switching frequency
+    task_switches = sum(1 for i in range(len(activities) - 1) if activities[i]['category'] != activities[i+1]['category'])
+    task_switch_rate = task_switches / (total_activities - 1) if total_activities > 1 else 0
+    insights += f"\nTask switching rate: {task_switch_rate:.2f} switches per activity\n"
+    
+    # Work-life balance
+    work_time = sum(duration for category, duration in category_durations.items() if category == 'Coding' or category == 'Writing')
+    total_time = sum(category_durations.values())
+    work_life_ratio = work_time / total_time if total_time > 0 else 0
+    insights += f"\nWork-life balance: {work_life_ratio:.2f} (ratio of work to total activities)\n"
+    
     return insights
+
+def generate_recommendations(insights):
+    "Generate recommendations based on activity insights"
+    recommendations = []
+    
+    # Parse insights to extract key metrics
+    work_life_ratio = float(re.search(r"Work-life balance: ([\d.]+)", insights).group(1))
+    task_switch_rate = float(re.search(r"Task switching rate: ([\d.]+)", insights).group(1))
+    longest_focus = float(re.search(r"Longest focus period: ([\d.]+)", insights).group(1))
+    
+    # Work-life balance recommendations
+    if work_life_ratio > 0.8:
+        recommendations.append("Consider taking more breaks to improve work-life balance.")
+    elif work_life_ratio < 0.4:
+        recommendations.append("Try to allocate more time for work-related tasks to increase productivity.")
+    
+    # Task switching recommendations
+    if task_switch_rate > 0.5:
+        recommendations.append("Your task switching rate is high. Try to group similar tasks together to reduce context switching.")
+    
+    # Focus recommendations
+    if longest_focus < 30:
+        recommendations.append("Your longest focus period is relatively short. Consider using techniques like the Pomodoro method to improve focus.")
+    
+    # Time management recommendation
+    recommendations.append("Review your 'Time spent on each category' to identify areas where you might want to reallocate your time.")
+    
+    return recommendations
 
 def generate_weekly_summary(start_date):
     "Generate a weekly summary based on daily summaries"
