@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from collections import Counter
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import config
+from src.rag_agent.notifications.service import notification_service
 
 DATA_DIR = config.get('DATA_DIR')
 SUMMARIES_DIR = config.get('SUMMARIES_DIR')
@@ -34,12 +35,16 @@ def process_status_files():
                         logger.info(f"Processed status file: {filename}")
                 except json.JSONDecodeError as e:
                     logger.error(f"Error decoding JSON in file {filename}: {e}")
+                    notification_service.send_notification('critical_error', f"Error decoding JSON in file {filename}: {e}")
                 except KeyError as e:
                     logger.error(f"Missing key in status data for file {filename}: {e}")
+                    notification_service.send_notification('critical_error', f"Missing key in status data for file {filename}: {e}")
                 except Exception as e:
                     logger.error(f"Unexpected error processing file {filename}: {e}")
+                    notification_service.send_notification('critical_error', f"Unexpected error processing file {filename}: {e}")
     except Exception as e:
         logger.error(f"Error accessing status directory: {e}")
+        notification_service.send_notification('critical_error', f"Error accessing status directory: {e}")
         raise StatusFileProcessingError(f"Failed to process status files: {e}")
     
     return project_summary
@@ -98,6 +103,8 @@ def generate_daily_summary(project_summary, activities):
     
     summary += "\nActivity Insights:\n"
     summary += generate_activity_insights(activities)
+    
+    notification_service.send_notification('report_completion', f"Daily summary generated for {datetime.now().strftime('%Y-%m-%d')}")
     
     return summary
 
@@ -163,6 +170,8 @@ def generate_weekly_summary(start_date):
     weekly_summary += "Total Activities:\n"
     for category, count in total_activities.items():
         weekly_summary += f"- {category}: {count} activities\n"
+    
+    notification_service.send_notification('report_completion', f"Weekly summary generated for {start_date.strftime('%Y-%m-%d')} to {(start_date + timedelta(days=6)).strftime('%Y-%m-%d')}")
     
     return weekly_summary
 
