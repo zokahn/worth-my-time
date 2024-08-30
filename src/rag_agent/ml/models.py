@@ -2,11 +2,18 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 from src.rag_agent.utils.logging_config import logger
 
 class ActivityPredictor:
     def __init__(self):
-        self.model = RandomForestClassifier(n_estimators=100, random_state=42)
+        self.model = Pipeline([
+            ('tfidf', TfidfVectorizer(max_features=1000)),
+            ('scaler', StandardScaler(with_mean=False)),
+            ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
+        ])
 
     def prepare_data(self, activities):
         X = []
@@ -16,11 +23,11 @@ class ActivityPredictor:
                 activity['timestamp'].hour,
                 activity['timestamp'].minute,
                 activity['timestamp'].weekday(),
-                hash(activity['window_title']) % 1000  # Simple feature hashing
+                activity['window_title']
             ]
             X.append(features)
             y.append(activity['category'])
-        return np.array(X), np.array(y)
+        return X, np.array(y)
 
     def train(self, activities):
         X, y = self.prepare_data(activities)
@@ -34,10 +41,17 @@ class ActivityPredictor:
         logger.info(f"Classification Report:\n{classification_report(y_test, y_pred)}")
 
     def predict(self, timestamp, window_title):
-        features = np.array([[
+        features = [[
             timestamp.hour,
             timestamp.minute,
             timestamp.weekday(),
-            hash(window_title) % 1000
-        ]])
+            window_title
+        ]]
         return self.model.predict(features)[0]
+
+    def get_feature_importance(self):
+        tfidf = self.model.named_steps['tfidf']
+        classifier = self.model.named_steps['classifier']
+        feature_importance = classifier.feature_importances_
+        feature_names = tfidf.get_feature_names_out()
+        return sorted(zip(feature_names, feature_importance), key=lambda x: x[1], reverse=True)

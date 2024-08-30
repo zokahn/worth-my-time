@@ -5,17 +5,15 @@ from datetime import datetime, timedelta
 from src.rag_agent.config import config
 from src.rag_agent.visualization import generate_activity_pie_chart, generate_activity_timeline
 from src.rag_agent.ml.models import ActivityPredictor
-from src.rag_agent.ml.training import load_activities
+from src.rag_agent.ml.training import load_activities, load_model, analyze_feature_importance
 
 app = Flask(__name__)
 
 DATA_DIR = config.get('DATA_DIR')
 SUMMARIES_DIR = config.get('SUMMARIES_DIR')
 
-# Initialize and train the activity predictor
-activities = load_activities()
-predictor = ActivityPredictor()
-predictor.train(activities)
+# Load the trained model
+predictor = load_model()
 
 @app.route('/')
 def dashboard():
@@ -74,6 +72,11 @@ def predict_activity():
     window_title = data['window_title']
     predicted_category = predictor.predict(timestamp, window_title)
     return jsonify({'predicted_category': predicted_category})
+
+@app.route('/api/feature_importance')
+def feature_importance():
+    importance = predictor.get_feature_importance()
+    return jsonify({'feature_importance': importance[:10]})  # Return top 10 features
 
 if __name__ == '__main__':
     app.run(debug=True)

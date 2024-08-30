@@ -27,6 +27,11 @@
         <div class="chart-container">
             <canvas id="activity-timeline"></canvas>
         </div>
+
+        <h2>Feature Importance</h2>
+        <div class="chart-container">
+            <canvas id="feature-importance-chart"></canvas>
+        </div>
     </div>
 
     <script>
@@ -83,6 +88,34 @@
                         scales: {
                             x: { stacked: true, title: { display: true, text: 'Hour of Day' } },
                             y: { stacked: true, title: { display: true, text: 'Number of Activities' } }
+                        }
+                    }
+                });
+            });
+
+        // Fetch and display feature importance
+        fetch('/api/feature_importance')
+            .then(response => response.json())
+            .then(data => {
+                const features = data.feature_importance.map(item => item[0]);
+                const importance = data.feature_importance.map(item => item[1]);
+
+                new Chart(document.getElementById('feature-importance-chart'), {
+                    type: 'bar',
+                    data: {
+                        labels: features,
+                        datasets: [{
+                            label: 'Feature Importance',
+                            data: importance,
+                            backgroundColor: '#4BC0C0'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Importance' }
+                            }
                         }
                     }
                 });

@@ -4,6 +4,7 @@ from src.rag_agent.config import DATA_DIR
 from src.rag_agent.ml.models import ActivityPredictor
 from src.rag_agent.utils.logging_config import logger
 import os
+import joblib
 
 def load_activities(days=30):
     activities = []
@@ -22,12 +23,29 @@ def train_activity_predictor():
     activities = load_activities()
     if not activities:
         logger.warning("No activities found for training")
-        return
+        return None
 
     predictor = ActivityPredictor()
     predictor.train(activities)
     return predictor
 
+def save_model(model, filename='activity_predictor.joblib'):
+    joblib.dump(model, filename)
+    logger.info(f"Model saved to {filename}")
+
+def load_model(filename='activity_predictor.joblib'):
+    model = joblib.load(filename)
+    logger.info(f"Model loaded from {filename}")
+    return model
+
+def analyze_feature_importance(model):
+    feature_importance = model.get_feature_importance()
+    logger.info("Top 10 most important features:")
+    for feature, importance in feature_importance[:10]:
+        logger.info(f"{feature}: {importance}")
+
 if __name__ == "__main__":
     trained_model = train_activity_predictor()
-    # Here you could save the trained model for later use
+    if trained_model:
+        save_model(trained_model)
+        analyze_feature_importance(trained_model)
