@@ -73,12 +73,12 @@ class PrivacyClassifier:
     def __init__(self):
         self.model = Pipeline([
             ('tfidf', TfidfVectorizer(max_features=500)),
-            ('classifier', RandomForestClassifier(n_estimators=50, random_state=42))
+            ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
         ])
 
     def train(self, activities):
         X = [activity['window_title'] for activity in activities]
-        y = [activity['privacy'] for activity in activities]
+        y = [activity.get('privacy', 'unknown') for activity in activities]
         
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
@@ -94,3 +94,14 @@ class PrivacyClassifier:
 
     def predict_proba(self, window_title):
         return self.model.predict_proba([window_title])[0]
+
+    def get_feature_importance(self):
+        tfidf = self.model.named_steps['tfidf']
+        classifier = self.model.named_steps['classifier']
+        feature_importance = classifier.feature_importances_
+        feature_names = tfidf.get_feature_names_out()
+        return sorted(zip(feature_names, feature_importance), key=lambda x: x[1], reverse=True)
+
+    def get_top_features(self, n=10):
+        feature_importance = self.get_feature_importance()
+        return feature_importance[:n]

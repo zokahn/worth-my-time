@@ -34,45 +34,25 @@ def get_active_window_title():
 
 from src.rag_agent.plugins import plugin_manager
 from src.rag_agent.utils.nlp import categorize_text
-from src.rag_agent.ml.models import ActivityPredictor
+from src.rag_agent.ml.models import ActivityPredictor, PrivacyClassifier
 from src.rag_agent.ml.training import load_activities
 
 activity_predictor = ActivityPredictor()
+privacy_classifier = PrivacyClassifier()
 
 def categorize_activity(active_window_title):
     "Categorize the activity based on the active window title using machine learning"
     timestamp = datetime.now()
     category = activity_predictor.predict(timestamp, active_window_title)
-    privacy = classify_privacy(active_window_title)
+    privacy = privacy_classifier.predict(active_window_title)
     return category, privacy
 
-def classify_privacy(text):
-    "Classify the activity as private or business-related using machine learning"
-    # For now, we'll keep the keyword-based approach, but we'll improve this later
-    business_keywords = config.get('BUSINESS_KEYWORDS', [
-        'work', 'project', 'meeting', 'client', 'report', 'email', 
-        'slack', 'jira', 'confluence', 'task', 'deadline', 'presentation'
-    ])
-    private_keywords = config.get('PRIVATE_KEYWORDS', [
-        'personal', 'family', 'friend', 'hobby', 'entertainment', 'social'
-    ])
-    
-    text_lower = text.lower()
-    business_score = sum(1 for keyword in business_keywords if keyword in text_lower)
-    private_score = sum(1 for keyword in private_keywords if keyword in text_lower)
-    
-    if business_score > private_score:
-        return 'business'
-    elif private_score > business_score:
-        return 'private'
-    else:
-        return 'unknown'
-
 def train_models():
-    "Train the activity prediction model"
+    "Train the activity prediction and privacy classification models"
     activities = load_activities(days=30)  # Load last 30 days of activities
     activity_predictor.train(activities)
-    logger.info("Activity prediction model trained")
+    privacy_classifier.train(activities)
+    logger.info("Activity prediction and privacy classification models trained")
 
 def associate_activity_with_project(active_window_title):
     "Associate the activity with a project based on the active window title using plugins"

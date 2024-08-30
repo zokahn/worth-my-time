@@ -20,6 +20,13 @@ train_models()
 # Start the activity monitor in the background
 subprocess.Popen(["python", os.path.join("src", "rag_agent", "data_collection", "activity_monitor.py")])
 
+# Initialize the dashboard
+from src.rag_agent.dashboard import app as dashboard_app
+import threading
+
+dashboard_thread = threading.Thread(target=dashboard_app.run, kwargs={'debug': False, 'use_reloader': False})
+dashboard_thread.start()
+
 # Generate and print the daily report for today
 print(generate_daily_report(datetime.now().strftime('%Y-%m-%d')))
 
