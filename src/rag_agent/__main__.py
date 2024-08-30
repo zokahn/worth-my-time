@@ -6,6 +6,8 @@ from src.rag_agent.reporting import generate_daily_report, generate_weekly_repor
 from project_assistant import analyze_status_files
 from src.rag_agent.rag_core import initialize_plugins
 from src.rag_agent.data_collection.activity_monitor import train_models
+from src.rag_agent.ml.models import ActivityPredictor, PrivacyClassifier
+from src.rag_agent.ml.training import load_activities
 
 sys.path.append('.')
 
@@ -14,8 +16,12 @@ print("RAG agent started")
 # Initialize plugins
 initialize_plugins()
 
-# Train machine learning models
-train_models()
+# Load activities and train machine learning models
+activities = load_activities(days=30)
+activity_predictor = ActivityPredictor()
+privacy_classifier = PrivacyClassifier()
+activity_predictor.train(activities)
+privacy_classifier.train(activities)
 
 # Start the activity monitor in the background
 subprocess.Popen(["python", os.path.join("src", "rag_agent", "data_collection", "activity_monitor.py")])

@@ -95,12 +95,11 @@ def feature_importance():
 
 @app.route('/api/model_performance')
 def model_performance():
-    # This should be implemented to return actual model performance metrics
-    # For now, we'll return placeholder data
+    accuracy, f1_score, confusion_matrix = predictor.get_model_performance()
     return jsonify({
-        'accuracy': 0.85,
-        'f1_score': 0.83,
-        'confusion_matrix': [[100, 10], [20, 90]]
+        'accuracy': accuracy,
+        'f1_score': f1_score,
+        'confusion_matrix': confusion_matrix.tolist()
     })
 
 if __name__ == '__main__':

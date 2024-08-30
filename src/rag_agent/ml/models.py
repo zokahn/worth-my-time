@@ -30,6 +30,7 @@ class ActivityPredictor:
         return X, np.array(y)
 
     def train(self, activities):
+        self.activities = activities  # Store activities for later use
         X, y = self.prepare_data(activities)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         
@@ -68,6 +69,15 @@ class ActivityPredictor:
     def get_top_features(self, n=10):
         feature_importance = self.get_feature_importance()
         return feature_importance[:n]
+
+    def get_model_performance(self):
+        X, y = self.prepare_data(self.activities)
+        X_test, y_test = X[-len(X)//5:], y[-len(y)//5:]  # Use last 20% as test set
+        y_pred = self.model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred, average='weighted')
+        conf_matrix = confusion_matrix(y_test, y_pred)
+        return accuracy, f1, conf_matrix
 
 class PrivacyClassifier:
     def __init__(self):
