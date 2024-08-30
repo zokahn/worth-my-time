@@ -3,3 +3,5 @@ Current State of Things:
 - The RAG agent is up and running.
 - The activity monitor script has been integrated into the main script.
 - The activity monitor script is currently using placeholder logic for tracking and categorizing activities.
+- The project structure has been updated to reflect the new plan.
+- The high-level design, goals, and project structure documents have been updated with the new plan.

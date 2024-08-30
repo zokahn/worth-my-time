@@ -1,8 +1,63 @@
 Project Structure:
 
-- src/
-  - rag_agent/
-    - data_collection/
-      - activity_monitor.py: This script monitors workstation activities and logs them.
-    - __main__.py: This is the main script of the RAG agent. It starts the activity monitor script in the background.
-- status/: This directory contains various documentation files.
+```
+rag-agent/
+├── .gitignore
+├── pyproject.toml
+├── requirements.txt
+├── Makefile
+├── README.md
+├── CHANGELOG.md
+├── LICENSE
+├── docs/
+│   ├── conf.py
+│   ├── index.rst
+│   └── user_guide.rst
+├── tests/
+│   ├── __init__.py
+│   ├── test_data_collection.py
+│   ├── test_data_storage.py
+│   ├── test_rag_core.py
+│   └── test_reporting.py
+├── src/
+│   └── rag_agent/
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── data_collection/
+│       ├── data_storage/
+│       ├── rag_core/
+│       ├── reporting/
+│       └── cli.py
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+├── status/
+│   ├── state-of-things.txt
+│   ├── project_structure.txt
+│   ├── hld.txt
+│   ├── goals.md
+│   ├── decisions_log.md
+│   └── open_questions.md
+├── project_assistant.py
+├── metrics/
+│   ├── code_quality.json
+│   ├── test_coverage.json
+│   ├── performance_benchmarks.json
+│   └── development_velocity.json
+├── visualize.py
+├── dashboard.html
+├── code_reviewer.py
+├── plugins/
+│   ├── data_sources/
+│   ├── analysis/
+│   └── output/
+├── chaos/
+│   ├── network_failure.py
+│   ├── high_load.py
+│   └── data_corruption.py
+├── nl_config.py
+└── evolution/
+    ├── v1/
+    ├── v2/
+    └── current -> ../src/rag_agent
+```
