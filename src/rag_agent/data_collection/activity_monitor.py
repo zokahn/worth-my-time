@@ -1,6 +1,7 @@
 import time
 import os
 from datetime import datetime
+from src.rag_agent.data_storage.data_store import store_activity
 
 import subprocess
 
@@ -46,8 +47,14 @@ def monitor_activities():
         # Associate the activity with a project
         associated_project = associate_activity_with_project(active_window_title)
 
-        # Log the activity
-        print(f"{datetime.now()}: {active_window_title} - {activity_category} - {associated_project}")
+        # Store the activity
+        activity = {
+            'timestamp': datetime.now().isoformat(),
+            'window_title': active_window_title,
+            'category': activity_category,
+            'project': associated_project
+        }
+        store_activity(activity)
 
         # Wait for a while before checking the active window title again
         time.sleep(1)
