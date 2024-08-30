@@ -147,10 +147,26 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('prediction-result').textContent = 
-                    `Predicted Category: ${data.predicted_category}`;
+                let resultHtml = `<p>Predicted Category: ${data.predicted_category}</p>`;
+                resultHtml += '<p>Probabilities:</p><ul>';
+                for (const [category, prob] of Object.entries(data.probabilities)) {
+                    resultHtml += `<li>${category}: ${(prob * 100).toFixed(2)}%</li>`;
+                }
+                resultHtml += '</ul>';
+                document.getElementById('prediction-result').innerHTML = resultHtml;
             });
         });
+
+        // Fetch and display model performance metrics
+        fetch('/api/model_performance')
+            .then(response => response.json())
+            .then(data => {
+                const performanceHtml = `
+                    <p>Model Accuracy: ${(data.accuracy * 100).toFixed(2)}%</p>
+                    <p>F1 Score: ${(data.f1_score * 100).toFixed(2)}%</p>
+                `;
+                document.getElementById('model-performance').innerHTML = performanceHtml;
+            });
     </script>
 </body>
 </html>

@@ -71,12 +71,26 @@ def predict_activity():
     timestamp = datetime.fromisoformat(data['timestamp'])
     window_title = data['window_title']
     predicted_category = predictor.predict(timestamp, window_title)
-    return jsonify({'predicted_category': predicted_category})
+    probabilities = predictor.predict_proba(timestamp, window_title)
+    return jsonify({
+        'predicted_category': predicted_category,
+        'probabilities': {category: float(prob) for category, prob in zip(predictor.model.classes_, probabilities)}
+    })
 
 @app.route('/api/feature_importance')
 def feature_importance():
-    importance = predictor.get_feature_importance()
-    return jsonify({'feature_importance': importance[:10]})  # Return top 10 features
+    importance = predictor.get_top_features(n=10)
+    return jsonify({'feature_importance': importance})
+
+@app.route('/api/model_performance')
+def model_performance():
+    # This should be implemented to return actual model performance metrics
+    # For now, we'll return placeholder data
+    return jsonify({
+        'accuracy': 0.85,
+        'f1_score': 0.83,
+        'confusion_matrix': [[100, 10], [20, 90]]
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

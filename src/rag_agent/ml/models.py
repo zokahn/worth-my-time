@@ -55,3 +55,16 @@ class ActivityPredictor:
         feature_importance = classifier.feature_importances_
         feature_names = tfidf.get_feature_names_out()
         return sorted(zip(feature_names, feature_importance), key=lambda x: x[1], reverse=True)
+
+    def predict_proba(self, timestamp, window_title):
+        features = [[
+            timestamp.hour,
+            timestamp.minute,
+            timestamp.weekday(),
+            window_title
+        ]]
+        return self.model.predict_proba(features)[0]
+
+    def get_top_features(self, n=10):
+        feature_importance = self.get_feature_importance()
+        return feature_importance[:n]

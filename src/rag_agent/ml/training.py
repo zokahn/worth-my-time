@@ -44,8 +44,19 @@ def analyze_feature_importance(model):
     for feature, importance in feature_importance[:10]:
         logger.info(f"{feature}: {importance}")
 
+def evaluate_model(model, test_activities):
+    X_test, y_test = model.prepare_data(test_activities)
+    y_pred = model.model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    logger.info(f"Model Accuracy on Test Set: {accuracy}")
+    logger.info(f"Classification Report:\n{classification_report(y_test, y_pred)}")
+
 if __name__ == "__main__":
     trained_model = train_activity_predictor()
     if trained_model:
         save_model(trained_model)
         analyze_feature_importance(trained_model)
+        
+        # Evaluate the model on a separate test set
+        test_activities = load_activities(days=7)  # Use the last 7 days as a test set
+        evaluate_model(trained_model, test_activities)
