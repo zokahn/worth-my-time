@@ -35,6 +35,7 @@ def get_active_window_title():
 from src.rag_agent.plugins import plugin_manager
 from src.rag_agent.utils.nlp import categorize_text
 from src.rag_agent.ml.models import ActivityPredictor
+from src.rag_agent.ml.training import load_activities
 
 activity_predictor = ActivityPredictor()
 
