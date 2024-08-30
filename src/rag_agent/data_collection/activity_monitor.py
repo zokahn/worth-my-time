@@ -66,9 +66,8 @@ def monitor_activities():
     while True:
         try:
             active_window_title = get_active_window_title()
-            activity_category = categorize_activity(active_window_title)
+            activity_category, privacy = categorize_activity(active_window_title)
             associated_project = associate_activity_with_project(active_window_title)
-            privacy = classify_privacy(active_window_title)
 
             activity = {
                 'timestamp': datetime.now().isoformat(),
