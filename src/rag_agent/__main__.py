@@ -1,8 +1,11 @@
 import os
 import subprocess
+import sys
 from datetime import datetime, timedelta
 from src.rag_agent.reporting import generate_daily_report, generate_weekly_report
 from project_assistant import analyze_status_files
+
+sys.path.append('.')
 
 print("RAG agent started")
 
