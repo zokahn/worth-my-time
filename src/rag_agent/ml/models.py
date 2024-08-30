@@ -69,15 +69,28 @@ class ActivityPredictor:
         feature_importance = self.get_feature_importance()
         return feature_importance[:n]
 
-    def predict_proba(self, timestamp, window_title):
-        features = [[
-            timestamp.hour,
-            timestamp.minute,
-            timestamp.weekday(),
-            window_title
-        ]]
-        return self.model.predict_proba(features)[0]
+class PrivacyClassifier:
+    def __init__(self):
+        self.model = Pipeline([
+            ('tfidf', TfidfVectorizer(max_features=500)),
+            ('classifier', RandomForestClassifier(n_estimators=50, random_state=42))
+        ])
 
-    def get_top_features(self, n=10):
-        feature_importance = self.get_feature_importance()
-        return feature_importance[:n]
+    def train(self, activities):
+        X = [activity['window_title'] for activity in activities]
+        y = [activity['privacy'] for activity in activities]
+        
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+        self.model.fit(X_train, y_train)
+        
+        y_pred = self.model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        logger.info(f"Privacy Classifier Model Accuracy: {accuracy}")
+        logger.info(f"Classification Report:\n{classification_report(y_test, y_pred)}")
+
+    def predict(self, window_title):
+        return self.model.predict([window_title])[0]
+
+    def predict_proba(self, window_title):
+        return self.model.predict_proba([window_title])[0]
