@@ -2,6 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 from collections import Counter
+import re
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import config
 from src.rag_agent.notifications.service import notification_service
