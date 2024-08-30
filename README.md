@@ -9,6 +9,9 @@
 - The project structure has been updated to reflect the new plan.
 - The high-level design, goals, and project structure documents have been updated with the new plan.
 - The status has been updated.
+- Machine learning integration has been initiated for advanced insights and predictions.
+- Initial structure for ML models and training has been created.
+- The data pipeline has been prepared to support the integration of ML models.
 
 ## Goals
 
@@ -29,16 +32,20 @@
 - Implement `code_reviewer.py` to perform AI-assisted code reviews and integrate it into the CI/CD pipeline.
 - Design and implement a plugin system in the `plugins/` directory.
 - Implement `nl_config.py` for natural language-based configuration of the RAG agent.
+- Implement machine learning integration for advanced insights and predictions.
 
 ## Decisions Log
 
 - Decided to implement the RAG agent in Python.
 - Decided to use the subprocess module to start the activity monitor script in the background.
+- Decided to integrate machine learning capabilities for advanced insights and predictions.
 
 ## Open Questions
 
 - What is the best way to categorize activities as private or business-related?
 - What is the best way to associate activities with specific projects?
+- How can we best integrate machine learning models into the existing architecture?
+- What are the most effective ways to train and update our machine learning models?
 
 ## High-Level Design
 

@@ -17,3 +17,4 @@
 - Implement `code_reviewer.py` to perform AI-assisted code reviews and integrate it into the CI/CD pipeline.
 - Design and implement a plugin system in the `plugins/` directory.
 - Implement `nl_config.py` for natural language-based configuration of the RAG agent.
+- Implement machine learning integration for advanced insights and predictions.
