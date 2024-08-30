@@ -32,12 +32,20 @@ def get_active_window_title():
         logger.error(f"Unexpected error in get_active_window_title: {e}")
         return "Error"
 
+from src.rag_agent.plugins import plugin_manager
+
 def categorize_activity(active_window_title):
-    "Categorize the activity based on the active window title using NLP"
+    "Categorize the activity based on the active window title using plugins"
+    categorizer_plugin = plugin_manager.get_plugin('activity_categorizer')
+    if categorizer_plugin:
+        return categorizer_plugin.execute(active_window_title, ACTIVITY_CATEGORIES)
     return categorize_text(active_window_title, ACTIVITY_CATEGORIES)
 
 def associate_activity_with_project(active_window_title):
-    "Associate the activity with a project based on the active window title using NLP"
+    "Associate the activity with a project based on the active window title using plugins"
+    project_associator_plugin = plugin_manager.get_plugin('project_associator')
+    if project_associator_plugin:
+        return project_associator_plugin.execute(active_window_title, PROJECT_KEYWORDS)
     return categorize_text(active_window_title, PROJECT_KEYWORDS)
 
 def monitor_activities():

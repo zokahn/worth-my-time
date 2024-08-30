@@ -6,11 +6,16 @@ import re
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import config
 from src.rag_agent.notifications.service import notification_service
+from src.rag_agent.plugins import plugin_manager
 
 DATA_DIR = config.get('DATA_DIR')
 SUMMARIES_DIR = config.get('SUMMARIES_DIR')
 from src.rag_agent.utils.exceptions import StatusFileProcessingError
 from src.rag_agent.utils.nlp import categorize_text
+
+def initialize_plugins():
+    plugin_manager.load_plugins()
+    logger.info("Plugins initialized")
 
 def process_status_files():
     "Process the ingested status files"
