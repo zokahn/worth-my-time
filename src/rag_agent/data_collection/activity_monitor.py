@@ -33,6 +33,7 @@ def get_active_window_title():
         return "Error"
 
 from src.rag_agent.plugins import plugin_manager
+from src.rag_agent.utils.nlp import categorize_text
 
 def categorize_activity(active_window_title):
     "Categorize the activity based on the active window title using plugins"
