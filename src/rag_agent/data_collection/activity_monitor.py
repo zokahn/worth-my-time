@@ -54,12 +54,24 @@ def categorize_activity(active_window_title):
 
 def classify_privacy(text):
     "Classify the activity as private or business-related based on keywords"
-    business_keywords = ['work', 'project', 'meeting', 'client', 'report', 'email', 'slack', 'jira', 'confluence']
+    business_keywords = config.get('BUSINESS_KEYWORDS', [
+        'work', 'project', 'meeting', 'client', 'report', 'email', 
+        'slack', 'jira', 'confluence', 'task', 'deadline', 'presentation'
+    ])
+    private_keywords = config.get('PRIVATE_KEYWORDS', [
+        'personal', 'family', 'friend', 'hobby', 'entertainment', 'social'
+    ])
+    
     text_lower = text.lower()
-    for keyword in business_keywords:
-        if keyword in text_lower:
-            return 'business'
-    return 'private'
+    business_score = sum(1 for keyword in business_keywords if keyword in text_lower)
+    private_score = sum(1 for keyword in private_keywords if keyword in text_lower)
+    
+    if business_score > private_score:
+        return 'business'
+    elif private_score > business_score:
+        return 'private'
+    else:
+        return 'unknown'
 
 def associate_activity_with_project(active_window_title):
     "Associate the activity with a project based on the active window title using plugins"
@@ -73,8 +85,9 @@ def monitor_activities():
     while True:
         try:
             active_window_title = get_active_window_title()
-            activity_category, privacy = categorize_activity(active_window_title)
+            activity_category = categorize_activity(active_window_title)
             associated_project = associate_activity_with_project(active_window_title)
+            privacy = classify_privacy(active_window_title)
 
             activity = {
                 'timestamp': datetime.now().isoformat(),
