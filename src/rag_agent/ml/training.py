@@ -5,6 +5,7 @@ from src.rag_agent.ml.models import ActivityPredictor
 from src.rag_agent.utils.logging_config import logger
 import os
 import joblib
+from sklearn.metrics import accuracy_score, classification_report
 
 def load_activities(days=30):
     activities = []
