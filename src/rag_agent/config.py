@@ -27,3 +27,6 @@ SUMMARIES_DIR = 'data/summaries'
 # Logging settings
 LOG_DIR = 'logs'
 LOG_LEVEL = 'INFO'
+
+# Weekly summary settings
+WEEKLY_SUMMARY_DAY = 6  # 0 = Monday, 6 = Sunday

@@ -74,10 +74,40 @@ def generate_daily_summary(project_summary, activities):
     
     return summary
 
+def generate_weekly_summary(start_date):
+    "Generate a weekly summary based on daily summaries"
+    weekly_summary = f"Weekly Summary for {start_date.strftime('%Y-%m-%d')} to {(start_date + timedelta(days=6)).strftime('%Y-%m-%d')}\n\n"
+    
+    total_activities = {}
+    for i in range(7):
+        date = start_date + timedelta(days=i)
+        daily_summary_file = os.path.join(SUMMARIES_DIR, f"{date.strftime('%Y-%m-%d')}_summary.txt")
+        
+        if os.path.exists(daily_summary_file):
+            with open(daily_summary_file, 'r') as file:
+                daily_summary = file.read()
+                
+            # Extract activity counts
+            activities_section = daily_summary.split("Today's Activities:\n")[-1]
+            for line in activities_section.split('\n'):
+                if ':' in line:
+                    category, count = line.split(':')
+                    category = category.strip('- ')
+                    count = int(count.split()[0])
+                    if category not in total_activities:
+                        total_activities[category] = 0
+                    total_activities[category] += count
+    
+    weekly_summary += "Total Activities:\n"
+    for category, count in total_activities.items():
+        weekly_summary += f"- {category}: {count} activities\n"
+    
+    return weekly_summary
+
 if __name__ == "__main__":
     project_summary = process_status_files()
     
-    # Load today's activities
+    # Generate daily summary
     today = datetime.now().strftime('%Y-%m-%d')
     activities_file = os.path.join(DATA_DIR, f'{today}.json')
     if os.path.exists(activities_file):
@@ -94,3 +124,14 @@ if __name__ == "__main__":
     os.makedirs(os.path.dirname(summary_file), exist_ok=True)
     with open(summary_file, 'w') as file:
         file.write(daily_summary)
+    
+    # Generate weekly summary (if it's the last day of the week)
+    if datetime.now().weekday() == 6:  # Sunday
+        start_of_week = datetime.now() - timedelta(days=6)
+        weekly_summary = generate_weekly_summary(start_of_week)
+        print(weekly_summary)
+        
+        # Save the weekly summary
+        weekly_summary_file = os.path.join(SUMMARIES_DIR, f'{start_of_week.strftime("%Y-%m-%d")}_weekly_summary.txt')
+        with open(weekly_summary_file, 'w') as file:
+            file.write(weekly_summary)

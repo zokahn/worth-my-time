@@ -106,6 +106,16 @@ def generate_end_of_day_summary():
     os.makedirs(os.path.dirname(summary_file), exist_ok=True)
     with open(summary_file, 'w') as file:
         file.write(daily_summary)
+    
+    # Generate weekly summary if it's the last day of the week
+    if datetime.now().weekday() == 6:  # Sunday
+        start_of_week = datetime.now() - timedelta(days=6)
+        weekly_summary = generate_weekly_summary(start_of_week)
+        
+        # Save the weekly summary
+        weekly_summary_file = os.path.join(DATA_DIR, 'summaries', f'{start_of_week.strftime("%Y-%m-%d")}_weekly_summary.txt')
+        with open(weekly_summary_file, 'w') as file:
+            file.write(weekly_summary)
 
 if __name__ == "__main__":
     ingest_status_files()
