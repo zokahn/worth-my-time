@@ -1,1 +1,37 @@
 .aider*
+# Python
+__pycache__
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.egg-info/
+*.eggs
+*.sdist
+*.wheel
+
+# Virtual environments
+venv/
+ENV/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+*.pyc
+*.pyo
+*.pyd
+*.prof
+*.pid
+*.log
+*.out
+*.hist
+*.DS_Store
