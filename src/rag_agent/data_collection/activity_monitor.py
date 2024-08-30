@@ -1,8 +1,8 @@
 import time
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.rag_agent.data_storage.data_store import store_activity, store_status_file
-from src.rag_agent.rag_core import process_status_files, generate_daily_summary
+from src.rag_agent.rag_core import process_status_files, generate_daily_summary, generate_weekly_summary
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import (
     ACTIVITY_MONITOR_INTERVAL, ACTIVITY_CATEGORIES, PROJECT_KEYWORDS,
