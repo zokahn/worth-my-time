@@ -1,7 +1,7 @@
 import time
 import os
 from datetime import datetime
-from src.rag_agent.data_storage.data_store import store_activity
+from src.rag_agent.data_storage.data_store import store_activity, store_status_file
 
 import subprocess
 
@@ -59,5 +59,16 @@ def monitor_activities():
         # Wait for a while before checking the active window title again
         time.sleep(1)
 
+def ingest_status_files():
+    "Ingest content from status files"
+    status_dir = 'status'
+    for filename in os.listdir(status_dir):
+        file_path = os.path.join(status_dir, filename)
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as file:
+                content = file.read()
+                store_status_file(filename, content)
+
 if __name__ == "__main__":
+    ingest_status_files()
     monitor_activities()
