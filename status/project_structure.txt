@@ -1,0 +1,8 @@
+Project Structure:
+
+- src/
+  - rag_agent/
+    - data_collection/
+      - activity_monitor.py: This script monitors workstation activities and logs them.
+    - __main__.py: This is the main script of the RAG agent. It starts the activity monitor script in the background.
+- status/: This directory contains various documentation files.

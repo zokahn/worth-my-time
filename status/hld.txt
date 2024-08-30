@@ -1,0 +1,3 @@
+High-Level Design:
+
+The RAG agent is designed to track the activity of the workstation and generate daily and weekly reports. The activities to be tracked include web browsing, team meetings, and terminal work, which are either private or business-related and associated with a specific project.
