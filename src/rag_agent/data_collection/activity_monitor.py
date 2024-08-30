@@ -9,16 +9,13 @@ def monitor_activities():
 
     while True:
         # Get the active window title
-        # TODO: Replace this placeholder logic with the actual logic to get the active window title
-        active_window_title = "Placeholder"
+        active_window_title = get_active_window_title()
 
         # Categorize the activity
-        # TODO: Replace this placeholder logic with the actual logic to categorize the activity
-        activity_category = "Placeholder"
+        activity_category = categorize_activity(active_window_title)
 
         # Associate the activity with a project
-        # TODO: Replace this placeholder logic with the actual logic to associate the activity with a project
-        associated_project = "Placeholder"
+        associated_project = associate_activity_with_project(active_window_title)
 
         # Log the activity
         print(f"{datetime.now()}: {active_window_title} - {activity_category} - {associated_project}")
