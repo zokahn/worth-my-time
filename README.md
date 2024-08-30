@@ -13,6 +13,13 @@
 - Initial structure for ML models and training has been created.
 - The data pipeline has been prepared to support the integration of ML models.
 
+## Hardware Requirements
+
+- CPU: Dual-core processor (2.0 GHz or higher)
+- RAM: 4 GB minimum, 8 GB recommended
+- Storage: 1 GB of free disk space for the application and data storage
+- Internet connection for sending notifications and accessing external services (if configured)
+
 ## Goals
 
 - Implement a cutting-edge Retrieval-Augmented Generation (RAG) agent.
