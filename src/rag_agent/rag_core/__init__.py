@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 from collections import Counter
 from src.rag_agent.utils.logging_config import logger
-from src.rag_agent.config import STATUS_DIR, DATA_DIR, SUMMARIES_DIR
+from src.rag_agent.config import config
 from src.rag_agent.utils.exceptions import StatusFileProcessingError
 from src.rag_agent.utils.nlp import categorize_text
 
@@ -194,3 +194,58 @@ if __name__ == "__main__":
         weekly_summary_file = os.path.join(SUMMARIES_DIR, f'{start_of_week.strftime("%Y-%m-%d")}_weekly_summary.txt')
         with open(weekly_summary_file, 'w') as file:
             file.write(weekly_summary)
+import os
+import yaml
+from typing import Dict, Any
+
+class ConfigLoader:
+    def __init__(self, config_file='config.yaml'):
+        self.config_file = config_file
+        self.config = self.load_config()
+
+    def load_config(self) -> Dict[str, Any]:
+        env = os.getenv('RAG_AGENT_ENV', 'dev')
+        config_file = f'config.{env}.yaml'
+
+        try:
+            with open(config_file, 'r') as f:
+                config = yaml.safe_load(f)
+            
+            # Load user-specific config if it exists
+            user_config_file = 'config.user.yaml'
+            if os.path.exists(user_config_file):
+                with open(user_config_file, 'r') as f:
+                    user_config = yaml.safe_load(f)
+                config.update(user_config)
+            
+            return config
+        except FileNotFoundError:
+            raise ConfigError(f"Configuration file {config_file} not found")
+        except yaml.YAMLError as e:
+            raise ConfigError(f"Error parsing YAML in {config_file}: {e}")
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return self.config.get(key, default)
+
+    def validate(self):
+        required_keys = ['ACTIVITY_MONITOR_INTERVAL', 'ACTIVITY_CATEGORIES', 'PROJECT_KEYWORDS', 'DATA_DIR', 'STATUS_DIR', 'SUMMARIES_DIR', 'LOG_DIR', 'LOG_LEVEL']
+        for key in required_keys:
+            if key not in self.config:
+                raise ConfigError(f"Missing required configuration key: {key}")
+
+class ConfigError(Exception):
+    pass
+
+# Initialize the global configuration
+config = ConfigLoader()
+config.validate()
+
+# Export configuration values
+ACTIVITY_MONITOR_INTERVAL = config.get('ACTIVITY_MONITOR_INTERVAL')
+ACTIVITY_CATEGORIES = config.get('ACTIVITY_CATEGORIES')
+PROJECT_KEYWORDS = config.get('PROJECT_KEYWORDS')
+DATA_DIR = config.get('DATA_DIR')
+STATUS_DIR = config.get('STATUS_DIR')
+SUMMARIES_DIR = config.get('SUMMARIES_DIR')
+LOG_DIR = config.get('LOG_DIR')
+LOG_LEVEL = config.get('LOG_LEVEL')

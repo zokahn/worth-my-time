@@ -1,0 +1,16 @@
+ACTIVITY_MONITOR_INTERVAL: 5
+ACTIVITY_CATEGORIES:
+  Coding: ['terminal', 'code', 'pycharm', 'intellij', 'vim', 'emacs']
+  Writing: ['word', 'docs', 'notepad', 'textedit']
+  Browsing: ['chrome', 'firefox', 'safari', 'edge']
+  Communication: ['slack', 'teams', 'zoom', 'skype']
+  Design: ['photoshop', 'illustrator', 'figma', 'sketch']
+PROJECT_KEYWORDS:
+  RAG Agent Development: ['rag-agent', 'rag_agent', 'ragagent']
+  Data Analysis: ['pandas', 'numpy', 'matplotlib', 'jupyter']
+  Web Development: ['django', 'flask', 'react', 'vue', 'angular']
+DATA_DIR: '/var/rag_agent/data'
+STATUS_DIR: '/var/rag_agent/data/status'
+SUMMARIES_DIR: '/var/rag_agent/data/summaries'
+LOG_DIR: '/var/log/rag_agent'
+LOG_LEVEL: 'WARNING'

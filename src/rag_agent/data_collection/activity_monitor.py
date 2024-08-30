@@ -4,10 +4,14 @@ from datetime import datetime, timedelta
 from src.rag_agent.data_storage import store_activity, store_status_file, store_daily_summary
 from src.rag_agent.rag_core import process_status_files, generate_daily_summary, generate_weekly_summary
 from src.rag_agent.utils.logging_config import logger
-from src.rag_agent.config import (
-    ACTIVITY_MONITOR_INTERVAL, ACTIVITY_CATEGORIES, PROJECT_KEYWORDS,
-    STATUS_DIR, DATA_DIR, SUMMARIES_DIR
-)
+from src.rag_agent.config import config
+
+ACTIVITY_MONITOR_INTERVAL = config.get('ACTIVITY_MONITOR_INTERVAL')
+ACTIVITY_CATEGORIES = config.get('ACTIVITY_CATEGORIES')
+PROJECT_KEYWORDS = config.get('PROJECT_KEYWORDS')
+STATUS_DIR = config.get('STATUS_DIR')
+DATA_DIR = config.get('DATA_DIR')
+SUMMARIES_DIR = config.get('SUMMARIES_DIR')
 from src.rag_agent.utils.exceptions import ActivityMonitorError
 from src.rag_agent.utils.nlp import categorize_text
 

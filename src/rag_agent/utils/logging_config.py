@@ -1,7 +1,10 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-from src.rag_agent.config import LOG_DIR, LOG_LEVEL
+from src.rag_agent.config import config
+
+LOG_DIR = config.get('LOG_DIR')
+LOG_LEVEL = config.get('LOG_LEVEL')
 
 def configure_logging():
     log_file = os.path.join(LOG_DIR, 'rag_agent.log')
