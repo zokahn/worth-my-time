@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Agent Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .chart-container { width: 100%; max-width: 600px; margin: 20px auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RAG Agent Dashboard</h1>
+        
+        <h2>Daily Summary</h2>
+        <div id="daily-summary"></div>
+        
+        <h2>Activity Categories</h2>
+        <div class="chart-container">
+            <canvas id="activity-pie-chart"></canvas>
+        </div>
+        
+        <h2>Activity Timeline</h2>
+        <div class="chart-container">
+            <canvas id="activity-timeline"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display daily summary
+        fetch('/api/daily_summary')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('daily-summary').innerText = data.summary;
+            });
+
+        // Fetch activity data and create charts
+        fetch('/api/activity_data')
+            .then(response => response.json())
+            .then(activities => {
+                const categories = {};
+                const timeline = {};
+
+                activities.forEach(activity => {
+                    // Count categories
+                    categories[activity.category] = (categories[activity.category] || 0) + 1;
+
+                    // Group activities by hour for timeline
+                    const hour = new Date(activity.timestamp).getHours();
+                    if (!timeline[hour]) timeline[hour] = {};
+                    timeline[hour][activity.category] = (timeline[hour][activity.category] || 0) + 1;
+                });
+
+                // Create pie chart
+                new Chart(document.getElementById('activity-pie-chart'), {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(categories),
+                        datasets: [{
+                            data: Object.values(categories),
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                            ]
+                        }]
+                    }
+                });
+
+                // Create timeline chart
+                new Chart(document.getElementById('activity-timeline'), {
+                    type: 'bar',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => i),
+                        datasets: Object.keys(categories).map(category => ({
+                            label: category,
+                            data: Array.from({length: 24}, (_, i) => timeline[i] ? timeline[i][category] || 0 : 0),
+                            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
+                        }))
+                    },
+                    options: {
+                        scales: {
+                            x: { stacked: true, title: { display: true, text: 'Hour of Day' } },
+                            y: { stacked: true, title: { display: true, text: 'Number of Activities' } }
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+</html>

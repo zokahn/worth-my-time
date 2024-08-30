@@ -106,31 +106,27 @@ def generate_end_of_day_summary():
         logger.error(f"Error generating end-of-day summary: {e}")
         raise ActivityMonitorError(f"Failed to generate end-of-day summary: {e}")
 
-from src.rag_agent.visualization import generate_activity_pie_chart, generate_activity_timeline
+from src.rag_agent.dashboard import app as dashboard_app
+import threading
 
 if __name__ == "__main__":
     try:
+        # Start the dashboard in a separate thread
+        dashboard_thread = threading.Thread(target=dashboard_app.run, kwargs={'debug': False, 'use_reloader': False})
+        dashboard_thread.start()
+        
         ingest_status_files()
         monitor_activities()
         
-        # Generate end-of-day summary and visualizations
-        today = datetime.now().strftime('%Y-%m-%d')
-        activities_file = os.path.join(DATA_DIR, f'{today}.json')
+        # Generate end-of-day summary
+        generate_end_of_day_summary()
         
-        if os.path.exists(activities_file):
-            with open(activities_file, 'r') as file:
-                activities = json.load(file)
-            
-            generate_end_of_day_summary()
-            
-            # Generate visualizations
-            visualization_dir = os.path.join(SUMMARIES_DIR, 'visualizations')
-            generate_activity_pie_chart(activities, visualization_dir)
-            generate_activity_timeline(activities, visualization_dir)
-            
-            logger.info(f"Visualizations generated in {visualization_dir}")
-        else:
-            logger.warning(f"No activities found for {today}")
+        logger.info("RAG Agent and dashboard are running")
     
     except Exception as e:
         logger.critical(f"Critical error in main execution: {e}")
+    
+    finally:
+        # Ensure the dashboard thread is properly terminated
+        if 'dashboard_thread' in locals() and dashboard_thread.is_alive():
+            dashboard_thread.join()
