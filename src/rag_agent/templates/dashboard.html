@@ -88,5 +88,36 @@
                 });
             });
     </script>
+    <h2>Activity Prediction</h2>
+    <form id="prediction-form">
+        <input type="datetime-local" id="timestamp" required>
+        <input type="text" id="window-title" placeholder="Window Title" required>
+        <button type="submit">Predict Activity</button>
+    </form>
+    <div id="prediction-result"></div>
+
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const timestamp = document.getElementById('timestamp').value;
+            const windowTitle = document.getElementById('window-title').value;
+            
+            fetch('/api/predict_activity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    timestamp: timestamp,
+                    window_title: windowTitle
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('prediction-result').textContent = 
+                    `Predicted Category: ${data.predicted_category}`;
+            });
+        });
+    </script>
 </body>
 </html>
