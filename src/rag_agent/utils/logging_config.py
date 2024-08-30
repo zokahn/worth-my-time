@@ -1,19 +1,25 @@
 import logging
 import os
+from logging.handlers import RotatingFileHandler
+from src.rag_agent.config import LOG_DIR, LOG_LEVEL
 
-def setup_logging():
-    log_dir = 'logs'
-    os.makedirs(log_dir, exist_ok=True)
+def configure_logging():
+    log_file = os.path.join(LOG_DIR, 'rag_agent.log')
+    os.makedirs(LOG_DIR, exist_ok=True)
     
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(os.path.join(log_dir, 'rag_agent.log')),
-            logging.StreamHandler()
-        ]
-    )
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    file_handler = RotatingFileHandler(log_file, maxBytes=10*1024*1024, backupCount=5)
+    file_handler.setFormatter(formatter)
+    
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    
+    logger = logging.getLogger('rag_agent')
+    logger.setLevel(getattr(logging, LOG_LEVEL))
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+    
+    return logger
 
-    return logging.getLogger(__name__)
-
-logger = setup_logging()
+logger = configure_logging()

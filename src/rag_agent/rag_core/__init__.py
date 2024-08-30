@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import STATUS_DIR, DATA_DIR, SUMMARIES_DIR
+from src.rag_agent.utils.exceptions import StatusFileProcessingError
 
 def process_status_files():
     "Process the ingested status files"
@@ -12,21 +13,29 @@ def process_status_files():
         for filename in os.listdir(STATUS_DIR):
             file_path = os.path.join(STATUS_DIR, filename)
             if os.path.isfile(file_path):
-                with open(file_path, 'r') as file:
-                    status_data = json.load(file)
-                    file_type = filename.split('.')[0]  # e.g., 'goals', 'decisions_log', etc.
-                    
-                    # Extract key information based on file type
-                    if file_type == 'goals':
-                        project_summary['goals'] = extract_goals(status_data['content'])
-                    elif file_type == 'decisions_log':
-                        project_summary['recent_decisions'] = extract_recent_decisions(status_data['content'])
-                    elif file_type == 'open_questions':
-                        project_summary['open_questions'] = extract_open_questions(status_data['content'])
-                    
-                    logger.info(f"Processed status file: {filename}")
+                try:
+                    with open(file_path, 'r') as file:
+                        status_data = json.load(file)
+                        file_type = filename.split('.')[0]  # e.g., 'goals', 'decisions_log', etc.
+                        
+                        # Extract key information based on file type
+                        if file_type == 'goals':
+                            project_summary['goals'] = extract_goals(status_data['content'])
+                        elif file_type == 'decisions_log':
+                            project_summary['recent_decisions'] = extract_recent_decisions(status_data['content'])
+                        elif file_type == 'open_questions':
+                            project_summary['open_questions'] = extract_open_questions(status_data['content'])
+                        
+                        logger.info(f"Processed status file: {filename}")
+                except json.JSONDecodeError as e:
+                    logger.error(f"Error decoding JSON in file {filename}: {e}")
+                except KeyError as e:
+                    logger.error(f"Missing key in status data for file {filename}: {e}")
+                except Exception as e:
+                    logger.error(f"Unexpected error processing file {filename}: {e}")
     except Exception as e:
-        logger.error(f"Error processing status files: {e}")
+        logger.error(f"Error accessing status directory: {e}")
+        raise StatusFileProcessingError(f"Failed to process status files: {e}")
     
     return project_summary
 
