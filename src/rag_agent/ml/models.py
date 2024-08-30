@@ -1,11 +1,13 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from src.rag_agent.utils.logging_config import logger
+import joblib
 
 class ActivityPredictor:
     def __init__(self):
@@ -40,6 +42,11 @@ class ActivityPredictor:
         accuracy = accuracy_score(y_test, y_pred)
         logger.info(f"Activity Predictor Model Accuracy: {accuracy}")
         logger.info(f"Classification Report:\n{classification_report(y_test, y_pred)}")
+        
+        # Perform cross-validation
+        cv_scores = cross_val_score(self.model, X, y, cv=5)
+        logger.info(f"Cross-validation scores: {cv_scores}")
+        logger.info(f"Mean CV score: {np.mean(cv_scores):.2f} (+/- {np.std(cv_scores) * 2:.2f})")
 
     def predict(self, timestamp, window_title):
         features = [[
@@ -78,6 +85,29 @@ class ActivityPredictor:
         f1 = f1_score(y_test, y_pred, average='weighted')
         conf_matrix = confusion_matrix(y_test, y_pred)
         return accuracy, f1, conf_matrix
+
+    def visualize_feature_importance(self, n=20):
+        feature_importance = self.get_feature_importance()
+        top_n = feature_importance[:n]
+        features, importance = zip(*top_n)
+        
+        plt.figure(figsize=(10, 6))
+        plt.bar(range(len(features)), importance)
+        plt.xticks(range(len(features)), features, rotation=90)
+        plt.xlabel('Features')
+        plt.ylabel('Importance')
+        plt.title(f'Top {n} Feature Importance')
+        plt.tight_layout()
+        plt.savefig('feature_importance.png')
+        logger.info(f"Feature importance visualization saved as 'feature_importance.png'")
+
+    def save_model(self, filename='activity_predictor_model.joblib'):
+        joblib.dump(self.model, filename)
+        logger.info(f"Model saved to {filename}")
+
+    def load_model(self, filename='activity_predictor_model.joblib'):
+        self.model = joblib.load(filename)
+        logger.info(f"Model loaded from {filename}")
 
 class PrivacyClassifier:
     def __init__(self):
