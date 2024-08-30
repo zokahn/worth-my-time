@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from src.rag_agent.data_storage.data_store import store_activity, store_status_file
 from src.rag_agent.rag_core import process_status_files, generate_daily_summary
+from src.rag_agent.utils.logging_config import logger
 
 import subprocess
 import json
@@ -10,11 +11,14 @@ import json
 def get_active_window_title():
     "Get the active window title"
     
-    # This command works on most Linux distributions
-    command = 'xdotool getwindowfocus getwindowname'
-    window_title = subprocess.check_output(command, shell=True).decode().strip()
-    
-    return window_title
+    try:
+        # This command works on most Linux distributions
+        command = 'xdotool getwindowfocus getwindowname'
+        window_title = subprocess.check_output(command, shell=True).decode().strip()
+        return window_title
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Error getting active window title: {e}")
+        return "Unknown"
 
 def categorize_activity(active_window_title):
     "Categorize the activity based on the active window title"
@@ -40,23 +44,29 @@ def monitor_activities():
     "Monitor workstation activities and log them"
 
     while True:
-        # Get the active window title
-        active_window_title = get_active_window_title()
+        try:
+            # Get the active window title
+            active_window_title = get_active_window_title()
 
-        # Categorize the activity
-        activity_category = categorize_activity(active_window_title)
+            # Categorize the activity
+            activity_category = categorize_activity(active_window_title)
 
-        # Associate the activity with a project
-        associated_project = associate_activity_with_project(active_window_title)
+            # Associate the activity with a project
+            associated_project = associate_activity_with_project(active_window_title)
 
-        # Store the activity
-        activity = {
-            'timestamp': datetime.now().isoformat(),
-            'window_title': active_window_title,
-            'category': activity_category,
-            'project': associated_project
-        }
-        store_activity(activity)
+            # Store the activity
+            activity = {
+                'timestamp': datetime.now().isoformat(),
+                'window_title': active_window_title,
+                'category': activity_category,
+                'project': associated_project
+            }
+            store_activity(activity)
+
+            logger.info(f"Activity logged: {activity}")
+
+        except Exception as e:
+            logger.error(f"Error in monitor_activities: {e}")
 
         # Wait for a while before checking the active window title again
         time.sleep(1)
@@ -64,12 +74,16 @@ def monitor_activities():
 def ingest_status_files():
     "Ingest content from status files"
     status_dir = 'status'
-    for filename in os.listdir(status_dir):
-        file_path = os.path.join(status_dir, filename)
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as file:
-                content = file.read()
-                store_status_file(filename, content)
+    try:
+        for filename in os.listdir(status_dir):
+            file_path = os.path.join(status_dir, filename)
+            if os.path.isfile(file_path):
+                with open(file_path, 'r') as file:
+                    content = file.read()
+                    store_status_file(filename, content)
+                    logger.info(f"Ingested status file: {filename}")
+    except Exception as e:
+        logger.error(f"Error ingesting status files: {e}")
 
 def generate_end_of_day_summary():
     "Generate and store the end-of-day summary"

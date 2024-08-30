@@ -1,27 +1,33 @@
 import os
 import json
 from datetime import datetime, timedelta
+from src.rag_agent.utils.logging_config import logger
 
 def process_status_files():
     "Process the ingested status files"
     status_dir = 'data/status'
     project_summary = {}
     
-    for filename in os.listdir(status_dir):
-        file_path = os.path.join(status_dir, filename)
-        if os.path.isfile(file_path):
-            with open(file_path, 'r') as file:
-                status_data = json.load(file)
-                file_type = filename.split('.')[0]  # e.g., 'goals', 'decisions_log', etc.
-                
-                # Extract key information based on file type
-                if file_type == 'goals':
-                    project_summary['goals'] = extract_goals(status_data['content'])
-                elif file_type == 'decisions_log':
-                    project_summary['recent_decisions'] = extract_recent_decisions(status_data['content'])
-                elif file_type == 'open_questions':
-                    project_summary['open_questions'] = extract_open_questions(status_data['content'])
-                
+    try:
+        for filename in os.listdir(status_dir):
+            file_path = os.path.join(status_dir, filename)
+            if os.path.isfile(file_path):
+                with open(file_path, 'r') as file:
+                    status_data = json.load(file)
+                    file_type = filename.split('.')[0]  # e.g., 'goals', 'decisions_log', etc.
+                    
+                    # Extract key information based on file type
+                    if file_type == 'goals':
+                        project_summary['goals'] = extract_goals(status_data['content'])
+                    elif file_type == 'decisions_log':
+                        project_summary['recent_decisions'] = extract_recent_decisions(status_data['content'])
+                    elif file_type == 'open_questions':
+                        project_summary['open_questions'] = extract_open_questions(status_data['content'])
+                    
+                    logger.info(f"Processed status file: {filename}")
+    except Exception as e:
+        logger.error(f"Error processing status files: {e}")
+    
     return project_summary
 
 def extract_goals(content):

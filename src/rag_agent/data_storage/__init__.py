@@ -1,32 +1,38 @@
 import json
 import os
 from datetime import datetime
+from src.rag_agent.utils.logging_config import logger
 
 def store_activity(activity):
     "Store the activity data in a JSON file"
 
-    # Get the current date
-    date = datetime.now().strftime('%Y-%m-%d')
+    try:
+        # Get the current date
+        date = datetime.now().strftime('%Y-%m-%d')
 
-    # Create the directory for storing the data if it doesn't exist
-    os.makedirs('data', exist_ok=True)
+        # Create the directory for storing the data if it doesn't exist
+        os.makedirs('data', exist_ok=True)
 
-    # Define the path to the JSON file
-    file_path = os.path.join('data', f'{date}.json')
+        # Define the path to the JSON file
+        file_path = os.path.join('data', f'{date}.json')
 
-    # Load the existing data
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-    else:
-        data = []
+        # Load the existing data
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+        else:
+            data = []
 
-    # Add the new activity to the data
-    data.append(activity)
+        # Add the new activity to the data
+        data.append(activity)
 
-    # Save the data
-    with open(file_path, 'w') as file:
-        json.dump(data, file, indent=4)
+        # Save the data
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+
+        logger.info(f"Activity stored: {activity}")
+    except Exception as e:
+        logger.error(f"Error storing activity: {e}")
 
 def store_status_file(filename, content):
     "Store the status file content"
