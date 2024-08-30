@@ -2,10 +2,20 @@ import time
 import os
 from datetime import datetime
 
+def get_active_window_title():
+    # TODO: Implement the logic to get the active window title
+    return "Placeholder"
+
+def categorize_activity(active_window_title):
+    # TODO: Implement the logic to categorize the activity
+    return "Placeholder"
+
+def associate_activity_with_project(active_window_title):
+    # TODO: Implement the logic to associate the activity with a project
+    return "Placeholder"
+
 def monitor_activities():
     "Monitor workstation activities and log them"
-
-    # TODO: Implement the logic to track the active window title and categorize the activity
 
     while True:
         # Get the active window title
