@@ -1,9 +1,11 @@
 import os
 import json
 from datetime import datetime, timedelta
+from collections import Counter
 from src.rag_agent.utils.logging_config import logger
 from src.rag_agent.config import STATUS_DIR, DATA_DIR, SUMMARIES_DIR
 from src.rag_agent.utils.exceptions import StatusFileProcessingError
+from src.rag_agent.utils.nlp import categorize_text
 
 def process_status_files():
     "Process the ingested status files"
@@ -55,7 +57,7 @@ def extract_open_questions(content):
     return content.strip().split('\n')
 
 def generate_daily_summary(project_summary, activities):
-    "Generate a daily summary based on project status and activities"
+    "Generate a detailed daily summary based on project status and activities"
     summary = f"Daily Summary for {datetime.now().strftime('%Y-%m-%d')}\n\n"
     
     summary += "Project Goals:\n"
@@ -71,17 +73,65 @@ def generate_daily_summary(project_summary, activities):
         summary += f"- {question}\n"
     
     summary += "\nToday's Activities:\n"
-    activity_categories = {}
+    activity_categories = Counter()
+    project_activities = Counter()
+    window_titles = []
+    
     for activity in activities:
-        category = activity['category']
-        if category not in activity_categories:
-            activity_categories[category] = 0
-        activity_categories[category] += 1
+        activity_categories[activity['category']] += 1
+        project_activities[activity['project']] += 1
+        window_titles.append(activity['window_title'])
     
     for category, count in activity_categories.items():
         summary += f"- {category}: {count} activities\n"
     
+    summary += "\nProject Breakdown:\n"
+    for project, count in project_activities.items():
+        summary += f"- {project}: {count} activities\n"
+    
+    summary += "\nMost Common Window Titles:\n"
+    for title, count in Counter(window_titles).most_common(5):
+        summary += f"- {title}: {count} times\n"
+    
+    summary += "\nActivity Insights:\n"
+    summary += generate_activity_insights(activities)
+    
     return summary
+
+def generate_activity_insights(activities):
+    "Generate insights from the day's activities"
+    insights = ""
+    total_activities = len(activities)
+    
+    if total_activities == 0:
+        return "No activities recorded today."
+    
+    # Time spent on each category
+    category_durations = Counter()
+    for i in range(len(activities) - 1):
+        duration = (datetime.fromisoformat(activities[i+1]['timestamp']) - 
+                    datetime.fromisoformat(activities[i]['timestamp'])).total_seconds() / 60
+        category_durations[activities[i]['category']] += duration
+    
+    insights += "Time spent on each category:\n"
+    for category, duration in category_durations.most_common():
+        insights += f"- {category}: {duration:.2f} minutes\n"
+    
+    # Most productive hour
+    hour_productivity = Counter()
+    for activity in activities:
+        hour = datetime.fromisoformat(activity['timestamp']).hour
+        hour_productivity[hour] += 1
+    
+    most_productive_hour = hour_productivity.most_common(1)[0]
+    insights += f"\nMost productive hour: {most_productive_hour[0]}:00 with {most_productive_hour[1]} activities\n"
+    
+    # Longest focus period
+    longest_focus = max(category_durations.values())
+    longest_focus_category = max(category_durations, key=category_durations.get)
+    insights += f"\nLongest focus period: {longest_focus:.2f} minutes on {longest_focus_category}\n"
+    
+    return insights
 
 def generate_weekly_summary(start_date):
     "Generate a weekly summary based on daily summaries"

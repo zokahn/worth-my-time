@@ -9,6 +9,7 @@ from src.rag_agent.config import (
     STATUS_DIR, DATA_DIR, SUMMARIES_DIR
 )
 from src.rag_agent.utils.exceptions import ActivityMonitorError
+from src.rag_agent.utils.nlp import categorize_text
 
 import subprocess
 import json
@@ -28,20 +29,12 @@ def get_active_window_title():
         return "Error"
 
 def categorize_activity(active_window_title):
-    "Categorize the activity based on the active window title"
-    active_window_title = active_window_title.lower()
-    for category, keywords in ACTIVITY_CATEGORIES.items():
-        if any(keyword in active_window_title for keyword in keywords):
-            return category
-    return 'Other'
+    "Categorize the activity based on the active window title using NLP"
+    return categorize_text(active_window_title, ACTIVITY_CATEGORIES)
 
 def associate_activity_with_project(active_window_title):
-    "Associate the activity with a project based on the active window title"
-    active_window_title = active_window_title.lower()
-    for project, keywords in PROJECT_KEYWORDS.items():
-        if any(keyword in active_window_title for keyword in keywords):
-            return project
-    return 'Other'
+    "Associate the activity with a project based on the active window title using NLP"
+    return categorize_text(active_window_title, PROJECT_KEYWORDS)
 
 def monitor_activities():
     "Monitor workstation activities and log them"
@@ -109,10 +102,31 @@ def generate_end_of_day_summary():
         logger.error(f"Error generating end-of-day summary: {e}")
         raise ActivityMonitorError(f"Failed to generate end-of-day summary: {e}")
 
+from src.rag_agent.visualization import generate_activity_pie_chart, generate_activity_timeline
+
 if __name__ == "__main__":
     try:
         ingest_status_files()
         monitor_activities()
-        generate_end_of_day_summary()
+        
+        # Generate end-of-day summary and visualizations
+        today = datetime.now().strftime('%Y-%m-%d')
+        activities_file = os.path.join(DATA_DIR, f'{today}.json')
+        
+        if os.path.exists(activities_file):
+            with open(activities_file, 'r') as file:
+                activities = json.load(file)
+            
+            generate_end_of_day_summary()
+            
+            # Generate visualizations
+            visualization_dir = os.path.join(SUMMARIES_DIR, 'visualizations')
+            generate_activity_pie_chart(activities, visualization_dir)
+            generate_activity_timeline(activities, visualization_dir)
+            
+            logger.info(f"Visualizations generated in {visualization_dir}")
+        else:
+            logger.warning(f"No activities found for {today}")
+    
     except Exception as e:
         logger.critical(f"Critical error in main execution: {e}")
