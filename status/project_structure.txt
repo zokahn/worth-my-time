@@ -27,6 +27,10 @@ rag-agent/
 │       ├── data_storage/
 │       ├── rag_core/
 │       ├── reporting/
+│       ├── ml/
+│       │   ├── __init__.py
+│       │   ├── models.py
+│       │   └── training.py
 │       └── cli.py
 ├── docker/
 │   ├── Dockerfile
