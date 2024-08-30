@@ -6,3 +6,4 @@ Current State of Things:
 - The activity monitor script is now associating activities with specific projects.
 - The project structure has been updated to reflect the new plan.
 - The high-level design, goals, and project structure documents have been updated with the new plan.
+- The status has been updated.
