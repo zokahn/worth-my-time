@@ -14,3 +14,20 @@ STATUS_DIR: '/var/rag_agent/data/status'
 SUMMARIES_DIR: '/var/rag_agent/data/summaries'
 LOG_DIR: '/var/log/rag_agent'
 LOG_LEVEL: 'WARNING'
+NOTIFICATION_CHANNELS:
+  email:
+    enabled: true
+    recipients: ['admin@example.com']
+    smtp_server: 'smtp.gmail.com'
+    smtp_port: 587
+    smtp_username: 'your_email@gmail.com'
+    smtp_password: 'your_password'
+  slack:
+    enabled: false
+    webhook_url: 'https://hooks.slack.com/services/YOUR_SLACK_WEBHOOK'
+  sms:
+    enabled: false
+    twilio_account_sid: 'YOUR_TWILIO_ACCOUNT_SID'
+    twilio_auth_token: 'YOUR_TWILIO_AUTH_TOKEN'
+    twilio_phone_number: '+1234567890'
+    recipient_phone_number: '+0987654321'
