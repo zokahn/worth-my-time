@@ -15,6 +15,38 @@
 - Storage: 1 GB of free disk space for the application and data storage
 - Internet connection for sending notifications and accessing external services (if configured)
 
+## Installation
+
+For detailed installation instructions, please refer to the [INSTALL.md](INSTALL.md) file.
+
+Quick start:
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/rag-agent.git
+   cd rag-agent
+   ```
+
+2. Create a virtual environment and activate it:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
+
+3. Install the required dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. Configure the application by editing `config.yaml` to match your environment.
+
+5. Run the RAG agent:
+   ```
+   python src/rag_agent/__main__.py
+   ```
+
+For more detailed instructions and troubleshooting, see [INSTALL.md](INSTALL.md).
+
 ## Goals
 
 ### Short-term Goals (1-3 months)
